@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import Menu, messagebox, filedialog
 import threading
 import sys
+import platform
 from config import *
 from database.manager import DatabaseManager
 from gui.chat_view import ChatView
@@ -15,45 +16,88 @@ from gui.input_view import InputView
 from logic.chat_controller import ChatController
 from logic.history import HistoryManager
 
+
 class MainWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("AI徐子越V3.0")
-        self.root.geometry("700x550")
+        self.root.geometry("800x600")
+        self.root.minsize(600, 450)  # 设置最小窗口尺寸
         self.root.configure(bg=COLOR_BG)
+
+        # 设置窗口图标（如果有的话）
+        # self.root.iconbitmap("path/to/icon.ico")  # Windows
+        # 在macOS上设置dock图标可能需要其他方法
 
         # 初始化数据库管理器和聊天控制器
         self.db_manager = DatabaseManager()
         self.chat_controller = ChatController(self.db_manager)
 
+        # 适应不同操作系统的界面调整
+        self._configure_platform_specifics()
+
         # 创建菜单
         self._create_menu()
 
+        # 创建主框架
+        self.main_frame = tk.Frame(self.root, bg=COLOR_BG)
+        self.main_frame.pack(padx=15, pady=15, expand=True, fill=tk.BOTH)
+
+        # 创建标题标签
+        self.title_label = tk.Label(
+            self.main_frame,
+            text="AI徐子越",
+            font=(FONT_FAMILY, 16, "bold"),
+            bg=COLOR_BG,
+            fg="#000000",
+            pady=5
+        )
+        self.title_label.pack(anchor="center", pady=(0, 10))
+
         # 创建聊天视图
-        self.chat_view = ChatView(self.root)
-        self.chat_view.pack(padx=10, pady=10, expand=True, fill=tk.BOTH)
+        self.chat_view = ChatView(self.main_frame)
+        self.chat_view.pack(padx=0, pady=(0, 10), expand=True, fill=tk.BOTH)
 
         # 创建输入视图
-        self.input_view = InputView(self.root, send_callback=self.on_send)
-        self.input_view.pack(fill=tk.X, padx=10, pady=(0, 10))
+        self.input_view = InputView(self.main_frame, send_callback=self.on_send)
+        self.input_view.pack(fill=tk.X, padx=0, pady=(0, 5))
 
         # 显示初始欢迎消息
-        self.chat_view.display_message(PREFIX_AI, "你好！我是 AI徐子越，很高兴为您服务。请问有什么我可以帮您的吗？", tags=('ai',))
+        self.chat_view.display_message(PREFIX_AI, "你好！我是 AI徐子越，很高兴为您服务。请问有什么我可以帮您的吗？",
+                                       tags=('ai',))
+
+    def _configure_platform_specifics(self):
+        """根据操作系统进行特定配置"""
+        if platform.system() == "Darwin":  # macOS
+            # macOS上的菜单样式调整
+            self.root.createcommand('::tk::mac::Quit', self.root.destroy)
+            # 其他macOS特定设置
+            pass
+        elif platform.system() == "Windows":
+            # Windows特定设置
+            pass
+        else:  # Linux
+            # Linux特定设置
+            pass
 
     def _create_menu(self):
         """
         创建菜单栏，包括新建对话、导出历史、退出等功能。
         """
         menubar = Menu(self.root)
+
         # 文件菜单
         file_menu = Menu(menubar, tearoff=0)
-        file_menu.add_command(label="新建对话", command=self.new_conversation)
+        file_menu.add_command(label="新建对话", command=self.new_conversation, accelerator="Ctrl+N")
         file_menu.add_separator()
         file_menu.add_command(label="导出为 Markdown", command=lambda: self.export_history(format='md'))
         file_menu.add_command(label="导出为 JSON", command=lambda: self.export_history(format='json'))
         file_menu.add_separator()
-        file_menu.add_command(label="退出", command=self.root.quit)
+        file_menu.add_command(label="退出", command=self.root.quit, accelerator="Alt+F4")
         menubar.add_cascade(label="菜单", menu=file_menu)
+
+        # 绑定快捷键
+        self.root.bind("<Control-n>", lambda event: self.new_conversation())
 
         self.root.config(menu=menubar)
 
@@ -64,7 +108,8 @@ class MainWindow:
         if messagebox.askyesno("确认", "确定要开始新对话吗？这将清空当前聊天记录，但不会删除历史保存。"):
             self.chat_view.clear()
             # 添加欢迎消息
-            self.chat_view.display_message(PREFIX_AI, "又见面了！我是 AI徐子越，很高兴为您服务。请问有什么我可以帮您的吗？", tags=('ai',))
+            self.chat_view.display_message(PREFIX_AI, "又见面了！我是 AI徐子越，很高兴为您服务。请问有什么我可以帮您的吗？",
+                                           tags=('ai',))
 
     def export_history(self, format):
         """

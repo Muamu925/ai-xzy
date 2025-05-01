@@ -6,6 +6,7 @@ config.py
 """
 import base64
 import sys
+import platform
 
 # -------------------- API 配置 --------------------
 try:
@@ -22,14 +23,21 @@ API_TIMEOUT = 45  # API 请求超时时间（秒）
 # ------------------ 数据库配置 -------------------
 DB_NAME = "xzy.db"  # 数据库文件名，存储聊天记录和响应模板
 
-# --------------- 界面样式配置 -------------------
+# --------------- 界面样式配置 (Apple 风格) -------------------
+# 根据操作系统选择最佳字体
+if platform.system() == "Darwin":  # macOS
+    FONT_FAMILY = "SF Pro"
+elif platform.system() == "Windows":
+    FONT_FAMILY = "Microsoft YaHei UI"
+else:  # Linux 和其他
+    FONT_FAMILY = "Noto Sans CJK SC"
+
 # 字体设置
-FONT_FAMILY = "宋体"  # 界面字体（可根据需求修改）
 FONT_SIZE_NORMAL = 11           # 普通文本字体大小
 FONT_SIZE_INPUT = 12            # 输入框文本字体大小
 
-# 颜色设置 (偏向 Apple 风格的简洁配色)
-COLOR_BG = "#F0F0F0"             # 应用程序背景色 (浅灰)
+# 颜色设置 (Apple 风格配色)
+COLOR_BG = "#F5F5F7"             # 应用程序背景色 (Apple 浅灰)
 COLOR_CHAT_BG = "#FFFFFF"        # 聊天区域背景色 (白色)
 COLOR_INPUT_BG = "#FFFFFF"       # 输入框背景色 (白色)
 COLOR_USER_FG = "#007AFF"        # 用户消息文本颜色 (苹果蓝)
@@ -39,8 +47,13 @@ COLOR_ERR_FG = "#FF3B30"         # 错误消息文本颜色 (苹果红)
 COLOR_BUTTON_BG = "#007AFF"      # 按钮背景色
 COLOR_BUTTON_FG = "#FFFFFF"      # 按钮文字颜色
 
+# 边框和阴影
+BORDER_COLOR = "#E5E5EA"         # 边框颜色
+BORDER_RADIUS = 8                # 圆角大小
+SHADOW_COLOR = "#00000015"       # 阴影颜色 (带透明度)
+
 # 文本前缀
 PREFIX_USER = "你: "
 PREFIX_AI = "AI徐子越: "
 PREFIX_SYSTEM_ERROR = "系统错误: "
-PREFIX_THINKING = "AI徐子越: "  # “思考中...” 的前缀
+PREFIX_THINKING = "AI徐子越: "  # "思考中..." 的前缀

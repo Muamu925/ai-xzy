@@ -8,56 +8,87 @@ import tkinter as tk
 from tkinter import scrolledtext, WORD, END, NORMAL, DISABLED, LEFT, RIGHT
 from config import *
 
+
 class ChatView(tk.Frame):
     def __init__(self, master):
-        super().__init__(master, bg=COLOR_CHAT_BG)
+        super().__init__(master, bg=COLOR_CHAT_BG, padx=2, pady=2)
+
+        # 创建带阴影效果的容器
+        self.container = tk.Frame(self, bg=COLOR_CHAT_BG, padx=1, pady=1)
+        self.container.pack(expand=True, fill=tk.BOTH)
+
+        # 设置圆角和阴影效果（使用标准tk功能模拟）
+        self.container.config(highlightbackground=BORDER_COLOR,
+                              highlightcolor=BORDER_COLOR,
+                              highlightthickness=1,
+                              bd=0)
+
         # 创建带滚动条的文本区域
         self.chat_area = scrolledtext.ScrolledText(
-            self,
+            self.container,
             wrap=WORD,
             state=DISABLED,
             font=(FONT_FAMILY, FONT_SIZE_NORMAL),
             bg=COLOR_CHAT_BG,
-            padx=10,
-            pady=10
+            relief=tk.FLAT,
+            padx=12,
+            pady=12,
+            borderwidth=0
         )
         self.chat_area.pack(expand=True, fill=tk.BOTH)
+
+        # 美化滚动条
+        scrollbar = self.chat_area.vbar
+        scrollbar.config(width=8, borderwidth=0, troughcolor=COLOR_BG)
+
         # 配置文本标签（样式）
         self._configure_tags()
 
     def _configure_tags(self):
-        """
-        定义不同消息类型的文本样式标签。
-        """
+        """定义不同消息类型的文本样式标签"""
         self.chat_area.tag_configure('user',
                                      foreground=COLOR_USER_FG,
                                      font=(FONT_FAMILY, FONT_SIZE_NORMAL, 'bold'),
-                                     justify=RIGHT,
-                                     spacing3=5)
+                                     lmargin1=20,
+                                     lmargin2=20,
+                                     rmargin=20,
+                                     spacing3=8)
+
         self.chat_area.tag_configure('ai',
                                      foreground=COLOR_AI_FG,
                                      font=(FONT_FAMILY, FONT_SIZE_NORMAL),
-                                     justify=LEFT,
-                                     spacing1=5,
-                                     spacing3=5)
+                                     lmargin1=20,
+                                     lmargin2=20,
+                                     rmargin=20,
+                                     spacing1=8,
+                                     spacing3=8)
+
         self.chat_area.tag_configure('system',
                                      foreground=COLOR_SYS_FG,
                                      font=(FONT_FAMILY, FONT_SIZE_NORMAL - 1, 'italic'),
-                                     justify=LEFT,
-                                     spacing1=5,
-                                     spacing3=5)
+                                     lmargin1=20,
+                                     lmargin2=20,
+                                     rmargin=20,
+                                     spacing1=8,
+                                     spacing3=8)
+
         self.chat_area.tag_configure('error',
                                      foreground=COLOR_ERR_FG,
                                      font=(FONT_FAMILY, FONT_SIZE_NORMAL, 'bold'),
-                                     justify=LEFT,
-                                     spacing1=5,
-                                     spacing3=5)
+                                     lmargin1=20,
+                                     lmargin2=20,
+                                     rmargin=20,
+                                     spacing1=8,
+                                     spacing3=8)
+
         self.chat_area.tag_configure('thinking',
                                      foreground=COLOR_SYS_FG,
                                      font=(FONT_FAMILY, FONT_SIZE_NORMAL, 'italic'),
-                                     justify=LEFT,
-                                     spacing1=5,
-                                     spacing3=5)
+                                     lmargin1=20,
+                                     lmargin2=20,
+                                     rmargin=20,
+                                     spacing1=8,
+                                     spacing3=8)
 
     def display_message(self, prefix, message, tags=('ai',)):
         """
